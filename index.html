@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reservas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<main class="wrap">
+  <div class="langs" id="langs" role="group" aria-label="Language"></div>
+  <div class="card">
+    <header class="brand">
+      <div class="rest" id="restName">&nbsp;</div>
+      <h1 id="title"></h1>
+    </header>
+
+    <!-- Krok 1: osoby, data, strefa, godzina -->
+    <section id="stepPick">
+      <div class="section">
+        <span class="label" id="lblGuests"></span>
+        <div class="stepper">
+          <button type="button" id="minus" aria-label="−">−</button>
+          <output id="partyOut" aria-live="polite"></output>
+          <button type="button" id="plus" aria-label="+">+</button>
+        </div>
+        <p class="msg" id="largeGroup" hidden></p>
+      </div>
+      <div class="section">
+        <span class="label" id="lblDate"></span>
+        <div class="days" id="days" role="group"></div>
+        <label class="otherdate"><span id="lblOther"></span><input type="date" id="dateInput"></label>
+      </div>
+      <div class="section" id="areaSection" hidden>
+        <span class="label" id="lblArea"></span>
+        <div class="chips" id="areas" role="group"></div>
+      </div>
+      <div class="section">
+        <span class="label" id="lblTimes"></span>
+        <div id="slots" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- Krok 2: dane gościa -->
+    <form id="stepForm" hidden novalidate>
+      <div class="summary">
+        <div><strong id="sumWhen"></strong><span id="sumParty"></span></div>
+        <button type="button" class="link" id="back"></button>
+      </div>
+      <h2 id="lblDetails"></h2>
+      <div class="field"><label for="fName" id="lblName"></label><input type="text" id="fName" autocomplete="name" maxlength="100" required></div>
+      <div class="field"><label for="fEmail" id="lblEmail"></label><input type="email" id="fEmail" autocomplete="email" maxlength="200" required></div>
+      <div class="field"><label for="fPhone"><span id="lblPhone"></span> <span class="hint" id="lblPhoneHint"></span></label><input type="tel" id="fPhone" autocomplete="tel" maxlength="30"></div>
+      <div class="field"><label for="fNote" id="lblNote"></label><textarea id="fNote" maxlength="500"></textarea></div>
+      <label class="check" id="healthWrap" hidden><input type="checkbox" id="fHealth"><span id="lblHealth"></span></label>
+      <div class="hp" aria-hidden="true"><label>Website<input type="text" id="fWebsite" tabindex="-1" autocomplete="off"></label></div>
+
+      <div class="notice" id="cardNotice" hidden>
+        <strong id="lblCardTitle"></strong>
+        <span id="lblCardText"></span>
+        <label class="check"><input type="checkbox" id="fPolicy"><span id="lblPolicy"></span></label>
+      </div>
+
+      <label class="check"><input type="checkbox" id="fMarketing"><span id="lblMarketing"></span></label>
+      <p class="msg err" id="formErr" hidden></p>
+      <div id="alts" class="slots" hidden></div>
+      <button class="primary" id="submit" type="submit"></button>
+      <p class="legal" id="lblPrivacy"></p>
+    </form>
+
+    <!-- Krok 3: potwierdzenie -->
+    <section id="stepDone" class="done" hidden>
+      <div class="tick" id="doneIcon">✓</div>
+      <h2 id="doneTitle"></h2>
+      <p class="when" id="doneWhen"></p>
+      <p id="doneText"></p>
+      <button type="button" class="secondary" id="again"></button>
+    </section>
+  </div>
+</main>
+<script src="/i18n.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Reserva</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<main class="wrap">
+  <div class="card">
+    <header class="brand">
+      <div class="rest" id="restName">&nbsp;</div>
+      <h1 id="title"></h1>
+    </header>
+    <div id="box"><p class="msg">…</p></div>
+  </div>
+</main>
+<script src="/i18n.js"></script>
+<script>
+(async () => {
+  const $ = (id) => document.getElementById(id);
+  const token = new URLSearchParams(location.search).get("token") || "";
+  let lang = pickLang(["es", "en", "de", "fr"]);
+  const t = (k, v) => fmt((I18N[lang] && I18N[lang][k]) || I18N.es[k] || k, v);
+  const box = $("box");
+  const say = (msg, cls = "msg") => { box.innerHTML = ""; const p = document.createElement("p"); p.className = cls; p.textContent = msg; box.appendChild(p); };
+
+  const res = await fetch(API + "?" + new URLSearchParams({ action: "lookup", token }));
+  const data = await res.json().catch(() => ({}));
+  if (!new URLSearchParams(location.search).get("lang") && data.language && I18N[data.language]) lang = data.language;
+  document.documentElement.lang = lang;
+  $("title").textContent = t("cancelTitle");
+  if (!res.ok) return say(res.status === 429 ? t("errTooMany") : t("notFound"), "msg err");
+
+  $("restName").textContent = data.restaurant;
+  const when = new Intl.DateTimeFormat(lang, { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Madrid" })
+    .format(new Date(data.starts_at));
+  box.innerHTML = `
+    <div class="summary"><div><strong id="w"></strong><span id="p"></span></div><span id="s"></span></div>
+    <p class="notice" id="late" hidden></p>
+    <p class="msg err" id="err" hidden></p>
+    <button class="primary" id="cancel" hidden></button>`;
+  $("w").textContent = when;
+  $("p").textContent = `${data.guest_name} · ${data.party_size === 1 ? t("person") : t("people", { n: data.party_size })}`;
+  $("s").textContent = t("status_" + data.status);
+
+  if (!data.can_cancel) {
+    if (data.status !== "cancelled") { $("err").textContent = t("notCancellable"); $("err").hidden = false; }
+    return;
+  }
+  if (data.late_cancel && data.card_required) { $("late").textContent = t("lateWarn", { h: 24 }); $("late").hidden = false; }
+  const btn = $("cancel");
+  btn.textContent = t("cancelBtn"); btn.hidden = false;
+  btn.onclick = async () => {
+    if (!confirm(t("cancelConfirm"))) return;
+    btn.disabled = true;
+    const r = await fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "cancel", token }) });
+    if (r.ok) return say(t("cancelled"));
+    btn.disabled = false;
+    $("err").textContent = r.status === 409 ? t("notCancellable") : t("errGeneric");
+    $("err").hidden = false;
+  };
+})();
+</script>
+</body>
+</html>
